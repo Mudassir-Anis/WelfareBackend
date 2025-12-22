@@ -1,0 +1,325 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Services</h2>
+<div class="row">
+    <div class="col-lg-12">
+        <div id="main_portlet" class="kt-portlet">
+            <div class="kt-portlet__body">
+                <form method="post" id="Banner_form" class="">
+                    <input type="hidden" name="Id" id="Id" value="" />
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary("", new { @class = "text-danger" })
+                    <div class="kt-form__group row">
+                        <div class="form-group col-lg-4 kt-form__group-sub">
+
+                            <div class="btn-group btn-group-toggle pull-left" data-toggle="buttons">
+                                <label class="btn btn-secondary active">
+                                    <input type="radio" name="Status" value="1" id="ActiveStatus" autocomplete="off" checked> Active
+                                </label>
+                                <label class="btn btn-secondary ">
+                                    <input type="radio" name="Status" value="0" id="InActiveStatus" autocomplete="off"> In Active
+                                </label>
+
+                            </div>
+
+
+                        </div>
+
+
+
+                    </div>
+                    <div class="kt-form__group row">
+
+
+                        <div class="form-group col-lg-6 kt-form__group-sub">
+
+                            <label for="Name" class="form-control-label">Service Name</label>
+                            <input type="text" class="form-control" required name="Name" id="Name">
+
+                        </div>
+
+                        <div class="form-group col-lg-6 kt-form__group-sub">
+
+                            <label for="Type" class="form-control-label">Service Type</label>
+                            <select name="Type" required id="Type" class="form-control">
+                                <option value="Hifz_Nazra">Hifz / Nazra</option>
+                                <option value="Qaida_Schooling">Qaida / Schooling</option>
+                                <option value="Darse_e_Nazami">Darse-e-Nazami</option>
+                                <option value="Family_Adoption">Family Adoption</option>
+                                <option value="Collective_Qurbani">Collective Qurbani</option>
+                                <option value="Tajheez_o_takfeen">Tajheez-o-takfeen</option>
+                                <option value="Nai_Zindagi">Nai Zindagi</option>
+                                <option value="DastarKhwan">DastarKhwan</option>
+                                <option value="Provide_Rashan">Provide Rashan</option>
+                                <option value="Eid_Package">Eid Package</option>
+                                <option value="Ramadhan_Package">Ramadhan Package</option>
+                                <option value="Renovate_Masjid_Islamic_School">Renovate Masjid/Islamic School </option>
+                                <option value="RO_Plant">RO Plant</option>
+                                <option value="Online_Istekhara">Online Istekhara</option>
+                                <option value="Online_Sadaqah">Online Sadaqah</option>
+                                <option value="Aqiqah">Aqiqah</option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+                    <div class="kt-form__group row">
+
+
+                        <div class="form-group col-lg-12 kt-form__group-sub">
+
+                            <label for="Text" class="form-control-label">Service Text</label>
+                            <textarea name="Text" id="Text" required class="form-control" rows="5"></textarea>
+
+                        </div>
+
+                    </div>
+                    <div class="kt-form__group row">
+
+
+                        <div class="form-group col-lg-8 kt-form__group-sub" id="filediv">
+
+                            <label for="FileName" class="form-control-label">Service Image</label>
+
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" name="FileName" id="FileName">
+                                <label class="custom-file-label" for="customFile">Choose file</label>
+                            </div>
+                            <div id="DeleteImageDiv" style="display:none">
+                                <img src="#" alt="Alternate Text" width="300" height="300" style="margin-top:20px" />
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                </form>
+                <div class="mb-1 mr-2 pull-right">
+                    <button type="button" id="btn_Submit" class="btn btn-brand m-btn m-btn--gradient-from-primary m-btn--gradient-to-info  m-btn--icon  btn-sm pull-right">
+                        <span class="ButtonContent">
+                            @*<i class="fa fa-save"></i>*@
+                            <span class="kt-hidden-mobile ButtonText">Save/Update</span>
+                        </span>
+
+
+                    </button>
+
+                </div>
+            </div>
+        </div>
+        <div id="main_portlet" class="kt-portlet">
+            <div class="kt-portlet__body">
+                <div class="col-md-12 kt-form__group-sub">
+                    <table id="Banner_list" class=" table table-bordered table table-striped table-bordered table-hover table-checkable display nowrap">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    //106 for save   107 error    108 update delete 109 1018
+    $(document).ready(function () {
+
+
+
+
+        $('#Banner_form').validate({
+            ignore: ':hidden',
+        });
+
+
+        GetData();
+
+        function GetData() {
+            var table = $('#Banner_list').DataTable({
+                'scrollX': true,
+                "ajax":
+                {
+                    "url": '/Services/GetServices',
+                    "data": function (d) {
+                    },
+                    "type": "GET"
+                },
+                "columns": [
+                    {
+                        title: 'S#',
+                        "data": "Id",
+                        render: function () {
+                            return 999;
+                        }
+                    },
+                    {
+                        title: "Service Name",
+                        "data": "Name",
+                        "class": "text-wrap"
+                    },
+                    {
+                        title: "Service Type",
+                        "data": "Type",
+
+                    },
+                    {
+                        title: "Image",
+                        "data": "Image",
+                        "class": "truncate",
+                        "render": function (data, type, row, meta) {
+                            return Utilities.IsUndefinedOrNull(data) ? '' : '<a class="btn btn-primary btn-sm" target="_blank" href="/Content/Services/' + data + '">View File</a>';
+                        }
+                    },
+
+                    {
+                        title: "Status",
+                        "data": "Status",
+                        "render": function (data, type, row, meta) {
+
+                            if (data) {
+                                return '<span class="kt-badge kt-badge--success  kt-badge--inline kt-badge--pill">Active</span>';
+
+                            }
+                            else
+                            {
+                                return '<span class="kt-badge kt-badge--danger  kt-badge--inline kt-badge--pill">In Active</span>';
+                            }
+
+                        }
+                    },
+
+
+                    {
+                        title: "Action(s)",
+                        "data": null,
+                        "render": function (data, type, row, meta) {
+                            return AppCodes.Dynamic.StandardButtons.Edit('edit') + AppCodes.Dynamic.StandardButtons.Remove('Delete');
+                        }
+                    }
+                ],
+                drawCallback: async function () {
+                    $('.Delete').off('click');
+                    $('.Delete').on('click', function () {
+                        let data = table.rows($(this).closest('tr')).data().toArray()[0];
+                        var _FormData = new FormData();
+                        _FormData.append('Id', data.Id);
+
+                        $.ajax({
+                            type: 'POST',
+                            url: '/Services/Delete',
+                            data: _FormData,
+                            processData: false,
+                            contentType: false,
+                            success: function (response) {
+                                if (response.Code == 1) {
+
+                                    $('#Banner_list').DataTable().destroy();
+                                    GetData();
+                                    Utilities.HTML.Toastr.Show(109);
+
+                                }
+                                else {
+                                    Utilities.HTML.Toastr.Show(107);
+                                }
+                            },
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                Utilities.HTML.Toastr.Show(107);
+                            }
+
+                        });
+
+
+                    });
+                    $('.edit').off('click');
+                    $('.edit').on('click', function () {
+
+                        document.getElementById('Banner_form').reset();
+                        $('#Banner_form .custom-file-label').text('Choose file');
+                        $('#Banner_form .custom-file-label').removeAttr('title');
+
+                        let data = table.rows($(this).closest('tr')).data().toArray()[0];
+                        $('#Id').val(data.Id);
+                        $('#Name').val(data.Name);
+                        $('#Type').val(data.Type);
+                        $('#Text').val(data.Text);
+                        $(data.Status == 1 ? '#ActiveStatus' : '#InActiveStatus').closest('.btn').button('toggle');
+
+                        if (!Utilities.IsUndefinedOrNull(data.Image)) {
+                            $('#DeleteImageDiv img').attr('src', '/Content/Services/' + data.Image);
+                            $('#DeleteImageDiv').show();
+                        }
+
+
+                    });
+                }
+            });
+            table.on('draw.dt', function () {
+                let info = table.page.info();
+                table.column(0, { search: 'applied', order: 'applied', page: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+
+        }
+
+        $('#btn_Submit').on('click', function () {
+            //if($('#comp_agreetocondition').prop('checked')){}else{}
+            debugger
+            if ($('#Banner_form').valid()) {
+                debugger
+                var _FormData = new FormData(document.getElementById('Banner_form'));
+                _FormData.append('Id', $('#Id').val());
+                _FormData.set('Status', $('input[name="Status"]:checked').val() == 1 ? true : false);
+                _FormData.append('File', $('#FileName')[0].files[0]);
+
+                $('#btn_Submit').html(spanner);
+                $.ajax({
+                    type: 'POST',
+                    url: '/Services/Submit',
+                    data: _FormData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.Code == 1) {
+
+                            $('#Banner_list').DataTable().destroy();
+                            GetData();
+                            document.getElementById("Banner_form").reset();
+                            $('.custom-file-label').text('Choose file');
+
+                            Utilities.HTML.Toastr.Show(106);
+                        }
+                        else {
+                            Utilities.HTML.Toastr.Show(107);
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        Utilities.HTML.Toastr.Show(107);
+                    },
+                    complete: function (response) {
+
+                        $('#btn_Submit').text('Save/Update');
+                    }
+                });
+               
+            }
+        });
+
+
+
+        $(".custom-file-input").on("change", function () {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
+
+
+    });
+</script>
+

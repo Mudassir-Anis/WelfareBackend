@@ -1,0 +1,263 @@
+﻿@{
+    ViewBag.Title = "Albums";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<h2>Albums</h2>
+
+    <form id="AlbumForm" enctype="multipart/form-data">
+        <input type="hidden" name="Id" />
+
+        <div class="form-group">
+            <label>Album Name</label>
+            <input type="text" name="AlbumName" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+            <label>Description</label>
+            <textarea name="AlbumDescription" class="form-control"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Thumbnail</label>
+            <input type="file" name="Thumbnail" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+            <label>Album Images</label>
+            <div id="imageContainer">
+                <input type="file" name="AlbumImages" class="form-control mb-2" />
+            </div>
+            <button type="button" id="addImage" class="btn btn-sm btn-primary">+ Add Image</button>
+        </div>
+
+        <button type="button" id="btnSave" class="btn btn-success">Save Album</button>
+    </form>
+
+    <hr />
+
+    <table id="AlbumTable" class="table table-bordered"></table>
+
+    <script>
+        $('#addImage').click(function () {
+            $('#imageContainer').append(
+                '<input type="file" name="AlbumImages" class="form-control mb-2" />'
+            );
+        });
+
+        $('#btnSave').click(function () {
+            var formData = new FormData($('#AlbumForm')[0]);
+
+            $.ajax({
+                url: '/Album/Submit',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (res) {
+                    if (res.Code == 1) {
+                        alert('Album saved');
+                        $('#AlbumForm')[0].reset();
+                        loadAlbums();
+                    }
+                }
+            });
+        });
+
+        function loadAlbums() {
+            $('#AlbumTable').DataTable({
+                destroy: true,
+                ajax: '/Album/GetAlbums',
+                columns: [
+                    { title: 'Name', data: 'AlbumName' },
+                    { title: 'Description', data: 'AlbumDescription' },
+                    {
+                        title: 'Thumbnail',
+                        data: 'Thumbnail',
+                        render: d => `<img src="/Content/Albums/${d}" width="80"/>`
+                    }
+                ]
+            });
+        }
+
+        loadAlbums();
+    </script>*@
+
+
+<h2>Albums</h2>
+
+<form id="AlbumForm" enctype="multipart/form-data">
+    <input type="hidden" name="Id" />
+
+    <div class="row">
+        <div class="col-md-4">
+            <label>Album Name</label>
+            <input type="text" name="AlbumName" class="form-control" required />
+        </div>
+
+        <div class="col-md-4">
+            <label>Description</label>
+            <textarea name="AlbumDescription" class="form-control"></textarea>
+        </div>
+
+        <div class="col-md-4">
+            <label>Thumbnail</label>
+            <input type="file" name="Thumbnail" class="form-control" />
+            <small>(Only required for new album)</small>
+        </div>
+    </div>
+
+    <br />
+
+    <div class="form-group">
+        <label>Album Images</label>
+        <div id="imageContainer">
+            <input type="file" name="AlbumImages" class="form-control mb-2" />
+        </div>
+        <button type="button" id="addImage" class="btn btn-sm btn-info">+ Add More</button>
+    </div>
+    <div id="existingImages" class="row mt-3"></div>
+
+    <button type="button" id="btnSave" class="btn btn-success">Save Album</button>
+</form>
+
+<hr />
+
+<table id="AlbumTable" class="table table-striped table-bordered"></table>
+<style>
+    .album-img-box {
+        position: relative;
+        margin: 8px;
+    }
+
+        .album-img-box img {
+            width: 120px;
+            height: 90px;
+            object-fit: cover;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .album-img-box .delete-img {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+</style>
+
+
+<script>
+    $('#addImage').click(function () {
+        $('#imageContainer').append(
+            '<input type="file" name="AlbumImages" class="form-control mb-2" />'
+        );
+    });
+
+    $('#btnSave').click(function () {
+        var formData = new FormData($('#AlbumForm')[0]);
+
+        $.ajax({
+            url: '/Album/Submit',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (res) {
+                if (res.Code == 1) {
+                    alert('Album saved successfully');
+                    $('#AlbumForm')[0].reset();
+                    loadAlbums();
+                }
+            }
+        });
+    });
+
+    function loadAlbums() {
+        $('#AlbumTable').DataTable({
+            destroy: true,
+            ajax: '/Album/GetAlbums',
+            columns: [
+                { title: 'Album', data: 'AlbumName' },
+                { title: 'Description', data: 'AlbumDescription' },
+                {
+                    title: 'Images',
+                    render: function () {
+                        return '<span class="badge badge-info">View</span>';
+                    }
+                },
+                {
+                    title: 'Actions',
+                    render: function (data, type, row) {
+                        return `
+                            <button class="btn btn-sm btn-warning" onclick="editAlbum(${row.Id})">Edit</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteAlbum(${row.Id})">Delete</button>
+                        `;
+                    }
+                }
+            ]
+        });
+    }
+
+    function editAlbum(id) {
+        $.get('/Album/GetAlbumById', { id }, function (res) {
+            $('input[name=Id]').val(res.Id);
+            $('input[name=AlbumName]').val(res.AlbumName);
+            $('textarea[name=AlbumDescription]').val(res.AlbumDescription);
+        });
+    }
+
+    function deleteAlbum(id) {
+        if (!confirm('Delete this album?')) return;
+
+        $.post('/Album/Delete', { id }, function (res) {
+            if (res.Code == 1) {
+                loadAlbums();
+            }
+        });
+    }
+
+    function editAlbum(id) {
+        $.get('/Album/GetAlbumById', { id }, function (res) {
+            $('input[name=Id]').val(res.Id);
+            $('input[name=AlbumName]').val(res.AlbumName);
+            $('textarea[name=AlbumDescription]').val(res.AlbumDescription);
+
+            loadExistingImages(res.Id);
+        });
+    }
+    function loadExistingImages(albumId) {
+        $('#existingImages').html('');
+
+        $.get('/Album/GetAlbumImages', { id: albumId }, function (res) {
+            res.forEach(img => {
+                $('#existingImages').append(`
+                <div class="album-img-box">
+                    <span class="delete-img" onclick="deleteImage(${img.Id})">×</span>
+                    <img src="/Content/Albums/${img.Image}" />
+                </div>
+            `);
+            });
+        });
+    }
+
+    function deleteImage(id) {
+        if (!confirm('Remove this image?')) return;
+
+        $.post('/Album/DeleteAlbumImage', { id }, function (res) {
+            if (res.Code == 1) {
+                $(`span[onclick="deleteImage(${id})"]`).parent().remove();
+            }
+        });
+    }
+
+
+
+
+    loadAlbums();
+</script>

@@ -1,0 +1,54 @@
+﻿using AlifSani.Models;
+using AlifSani.Models.EntityFramework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Web;
+using System.Web.Http;
+
+namespace AlifSani.Controllers.Api
+{
+    public class PressReleaseController : ApiController
+    {
+        [BasicAuthentication]
+        [HttpGet]
+        public WebApiResponse GET()
+        {
+            try
+            {
+                var services = Models.ApiDBHelper.PressReleases().ToList().ConvertAll(row => {
+
+                    return new PressRelease()
+                    {
+                        Id = row.Id,
+                        Title=row.Title,
+                        FileName = string.IsNullOrEmpty(row.FileName) ? "" : Url.Content("~/") + "Content/PressRelease/" + row.FileName,
+                        Status = row.Status,
+                        CreatedDate = row.CreatedDate
+
+                    };
+
+                });
+                return new WebApiResponse()
+                {
+                    IsSuccess = true,
+                    Data = services,
+                    Message = "Success"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new WebApiResponse()
+                {
+                    IsSuccess = false,
+                    Data = null,
+                    Message = ex.Message
+                };
+
+            }
+            
+        }
+    }
+}

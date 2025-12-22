@@ -1,0 +1,294 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Donation Customer</h2>
+
+<div class="row">
+    <div class="col-lg-12">
+
+        <div id="main_portlet" class="kt-portlet">
+            <div class="kt-portlet__body">
+                <div class="col-md-12 kt-form__group-sub">
+                    <table id="Banner_list" class=" table table-bordered table table-striped table-bordered table-hover table-checkable display nowrap">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Customer Detail</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6 kt-form__group-sub">
+                        <div class="form-group">
+                            <p style="margin-bottom:5px">
+                                <b>Title</b>
+                            </p>
+                            <span style="margin-left:5px;" class="Name">Title</span>
+                        </div>
+                        <div class="form-group">
+                            <p style="margin-bottom:5px">
+                                <b>FirstName</b>
+
+                            </p>
+                            <span style="margin-left:5px;" class="FirstName"></span>
+                        </div>
+                        <div class="form-group">
+                            <p style="margin-bottom:5px">
+                                <b>MiddleInitial</b>
+                            </p>
+                            <span style="margin-left:5px;" class="MiddleInitial"></span>
+                        </div>
+                        <div class="form-group">
+                            <p style="margin-bottom:5px">
+                                <b>LastName</b>
+                            </p>
+                            <span style="margin-left:5px;" class="LastName"></span>
+                        </div>
+                        <div class="form-group">
+                            <p style="margin-bottom:5px">
+                                <b>Phone</b>
+                            </p>
+                            <span style="margin-left:5px;" class="Phone"></span>
+                        </div>
+                        <div class="form-group">
+                            <p style="margin-bottom:5px">
+                                <b>Email</b>
+                            </p>
+                            <span style="margin-left:5px;" class="Email"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <p style="margin-bottom:5px">
+                                <b>Quantity</b>
+                            </p>
+                            <span style="margin-left:5px;" class="Quantity"></span>
+                        </div>
+                        <div class="form-group">
+                            <p style="margin-bottom:5px">
+                                <b>Type Of Donation</b>
+                            </p>
+                            <span style="margin-left:5px;" class="TypeOfDonation"></span>
+                        </div>
+                        <div class="form-group">
+                            <p style="margin-bottom:5px">
+                                <b>Created Date</b>
+                            </p>
+                            <span style="margin-left:5px;" class="CreatedDate"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 kt-form__group-sub">
+                        <div class="form-group">
+                            <p style="margin-bottom:5px">
+                                <b>Street Address</b>
+                            </p>
+                            <span style="margin-left:5px;" class="StreetAddress">Title</span>
+                        </div>
+                        <div class="form-group">
+                            <p style="margin-bottom:5px">
+                                <b>City</b>
+
+                            </p>
+                            <span style="margin-left:5px;" class="City"></span>
+                        </div>
+                        <div class="form-group">
+                            <p style="margin-bottom:5px">
+                                <b>State</b>
+                            </p>
+                            <span style="margin-left:5px;" class="State"></span>
+                        </div>
+                        <div class="form-group">
+                            <p style="margin-bottom:5px">
+                                <b>Last Name</b>
+                            </p>
+                            <span style="margin-left:5px;" class="LastName"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <p style="margin-bottom:5px">
+                                <b>Country</b>
+                            </p>
+                            <span style="margin-left:5px;" class="Country"></span>
+                        </div>
+                        <div class="form-group">
+                            <p style="margin-bottom:5px">
+                                <b>Amount</b>
+                            </p>
+                            <span style="margin-left:5px;" class="Amount"></span>
+                        </div>
+
+
+                        <div class="form-group">
+                            <p style="margin-bottom:5px">
+                                <b>Transaction Id</b>
+                            </p>
+                            <span style="margin-left:5px;" class="ExtraInformation"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <p style="margin-bottom:5px">
+                                <b>Payment Status</b>
+                            </p>
+                            <span style="margin-left:5px;" class="Status"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <p style="margin-bottom:5px">
+                                <b>Customer Initiated Payment</b>
+                            </p>
+                            <span style="margin-left:5px;" class="Zip"></span>
+                        </div>
+
+
+
+
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    //106 for save   107 error    108 update delete 109 1018
+    $(document).ready(function () {
+
+
+
+
+        $('#Banner_form').validate({
+            ignore: ':hidden',
+        });
+
+
+        GetData();
+
+        function GetData() {
+            var table = $('#Banner_list').DataTable({
+                'scrollX': true,
+                "ajax":
+                {
+                    "url": '/DonationCustomer/GetDonateCustomerInfos',
+                    "data": function (d) {
+                    },
+                    "type": "GET"
+                },
+                "columns": [
+                    {
+                        title: 'S#',
+                        "data": "Id",
+                        render: function () {
+                            return 999;
+                        }
+                    },
+                    {
+                        title: "Title",
+                        "data": "Title",
+
+                    },
+                    {
+                        title: "FirstName",
+                        "data": "FirstName",
+
+                    },
+                    //{
+                    //    title: "MiddleInitial",
+                    //    "data": "MiddleInitial",
+
+                    //},
+                    {
+                        title: "LastName",
+                        "data": "LastName",                        
+                    },
+                    {
+                        title: "Phone",
+                        "data": "Phone",
+                    },
+                    {
+                        title: "Email",
+                        "data": "Email",
+                    },
+                    {
+                        title: "Amount",
+                        "data": "Amount",
+                    },
+                    {
+                        title: "Status",
+                        "data": "Status",
+                    },
+
+
+                    
+                    {
+                        title: "Action(s)",
+                        "data": null,
+                        "render": function (data, type, row, meta) {
+                            return AppCodes.Dynamic.StandardButtons.Edit('edit');
+                        }
+                    }
+                ],
+                drawCallback: async function () {
+
+                    $('.edit').off('click');
+                    $('.edit').on('click', function () {
+
+                        let data = table.rows($(this).closest('tr')).data().toArray()[0];
+
+                        $('.Title').text(data.Title);
+                        $('.FirstName').text(data.FirstName);
+                        $('.MiddleInitial').text(data.MiddleInitial);
+                        $('.LastName').text(data.LastName);
+                        $('.Phone').text(data.Phone);
+                        $('.Email').text(data.Email);
+                        $('.StreetAddress').text(data.StreetAddress);
+                        $('.City').text(data.City);
+                        $('.State').text(data.State);
+                        $('.Zip').text(data.Zip);
+                        $('.Country').text(data.Country);
+                        $('.Amount').text(data.Amount);
+                        $('.Quantity').text(data.Quantity);
+                        //$('.ItemId').text(data.ItemId);
+                        $('.TypeOfDonation').text(data.TypeOfDonation);
+                        $('.ExtraInformation').text(data.ExtraInformation);
+                        $('.Status').text(data.Status);
+
+                        
+                        $('.CreatedDate').text(new moment(data.CreatedDate).format('DD-MM-YYYY'));
+                       
+                       
+                       
+
+
+
+                        $('#editModal').modal('show');
+
+                    });
+                }
+            });
+            table.on('draw.dt', function () {
+                let info = table.page.info();
+                table.column(0, { search: 'applied', order: 'applied', page: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+
+        }
+
+
+
+    });
+</script>
+

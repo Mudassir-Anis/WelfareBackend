@@ -1,0 +1,285 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Video Gallery</h2>
+<div class="row">
+    <div class="col-lg-12">
+        <div id="main_portlet" class="kt-portlet">
+            <div class="kt-portlet__body">
+                <form method="post" id="Banner_form" class="">
+                    <input type="hidden" name="Id" id="Id" value="" />
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary("", new { @class = "text-danger" })
+                    <div class="kt-form__group row">
+                        <div class="form-group col-lg-4 kt-form__group-sub">
+
+                            <div class="btn-group btn-group-toggle pull-left" data-toggle="buttons">
+                                <label class="btn btn-secondary active">
+                                    <input type="radio" name="Status" value="1" id="ActiveStatus" autocomplete="off" checked> Active
+                                </label>
+                                <label class="btn btn-secondary ">
+                                    <input type="radio" name="Status" value="0" id="InActiveStatus" autocomplete="off"> In Active
+                                </label>
+
+                            </div>
+
+
+                        </div>
+
+
+
+                    </div>
+                    <div class="kt-form__group row">
+
+
+                        <div class="form-group col-lg-8 kt-form__group-sub" id="filediv">
+
+                            <label for="FileName" class="form-control-label">Add/Edit</label>
+
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" name="FileName" id="FileName">
+                                <label class="custom-file-label" for="customFile">Choose file</label>
+                            </div>
+                            <div id="DeleteImageDiv" style="display:none">
+                                <img src="#" alt="Alternate Text" width="300" height="300" style="margin-top:20px" />
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                </form>
+                <div class="mb-1 mr-2 pull-right">
+                    <button type="button" id="btn_Submit" class="btn btn-brand m-btn m-btn--gradient-from-primary m-btn--gradient-to-info  m-btn--icon  btn-sm pull-right">
+                        <span class="ButtonContent">
+                            @*<i class="fa fa-save"></i>*@
+                            <span class="kt-hidden-mobile ButtonText">Save/Update</span>
+                        </span>
+
+
+                    </button>
+
+                </div>
+            </div>
+        </div>
+        <div id="main_portlet" class="kt-portlet">
+            <div class="kt-portlet__body">
+                <div class="col-md-12 kt-form__group-sub">
+                    <table id="Banner_list" class=" table table-bordered table table-striped table-bordered table-hover table-checkable display nowrap">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    //106 for save   107 error    108 update delete 109 1018
+    $(document).ready(function () {
+
+
+
+
+        $('#Banner_form').validate({
+            ignore: ':hidden',
+        });
+
+
+        GetData();
+
+        function GetData() {
+            var table = $('#Banner_list').DataTable({
+                'scrollX': true,
+                "ajax":
+                {
+                    "url": '/VideoGallery/GetVideoGalleries',
+                    "data": function (d) {
+                    },
+                    "type": "GET"
+                },
+                "columns": [
+                    {
+                        title: 'S#',
+                        "data": "Id",
+                        render: function () {
+                            return 999;
+                        }
+                    },
+
+                    {
+                        title: "Video",
+                        "data": "VideoPath",
+                        "class": "truncate",
+                        "render": function (data, type, row, meta) {
+                            return Utilities.IsUndefinedOrNull(data) ? '' : '<a class="btn btn-primary btn-sm" target="_blank" href="/Content/PhotoGallery/' + data + '">View File</a>';
+                        }
+                    },
+
+                    {
+                        title: "Status",
+                        "data": "Status",
+                        "render": function (data, type, row, meta) {
+
+                            if (data) {
+                                return '<span class="kt-badge kt-badge--success  kt-badge--inline kt-badge--pill">Active</span>';
+
+                            }
+                            else
+                            {
+                                return '<span class="kt-badge kt-badge--danger  kt-badge--inline kt-badge--pill">In Active</span>';
+                            }
+
+                        }
+                    },
+
+
+                    {
+                        title: "Action(s)",
+                        "data": null,
+                        "render": function (data, type, row, meta) {
+                            return AppCodes.Dynamic.StandardButtons.Edit('edit') + AppCodes.Dynamic.StandardButtons.Remove('Delete');
+                        }
+                    }
+                ],
+                drawCallback: async function () {
+                    $('.Delete').off('click');
+                    $('.Delete').on('click', function () {
+                        let data = table.rows($(this).closest('tr')).data().toArray()[0];
+                        var _FormData = new FormData();
+                        _FormData.append('Id', data.Id);
+
+                        $.ajax({
+                            type: 'POST',
+                            url: '/VideoGallery/Delete',
+                            data: _FormData,
+                            processData: false,
+                            contentType: false,
+                            success: function (response) {
+                                if (response.Code == 1) {
+
+                                    $('#Banner_list').DataTable().destroy();
+                                    GetData();
+                                    Utilities.HTML.Toastr.Show(109);
+
+                                }
+                                else {
+                                    Utilities.HTML.Toastr.Show(107);
+                                }
+                            },
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                Utilities.HTML.Toastr.Show(107);
+                            }
+
+                        });
+
+
+                    });
+                    $('.edit').off('click');
+                    $('.edit').on('click', function () {
+
+                        document.getElementById('Banner_form').reset();
+                        $('#Banner_form .custom-file-label').text('Choose file');
+                        $('#Banner_form .custom-file-label').removeAttr('title');
+
+                        let data = table.rows($(this).closest('tr')).data().toArray()[0];
+                        $('#Id').val(data.Id);
+                        $(data.Status == 1 ? '#ActiveStatus' : '#InActiveStatus').closest('.btn').button('toggle');
+
+                        if (!Utilities.IsUndefinedOrNull(data.Image)) {
+                            $('#DeleteImageDiv img').attr('src', '/Content/VideoGallery/' + data.Image);
+                            $('#DeleteImageDiv').show();
+                        }
+
+
+                    });
+                }
+            });
+            table.on('draw.dt', function () {
+                let info = table.page.info();
+                table.column(0, { search: 'applied', order: 'applied', page: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+
+        }
+
+        $('#btn_Submit').on('click', function () {
+            //if($('#comp_agreetocondition').prop('checked')){}else{}
+            debugger
+            if ($('#Banner_form').valid()) {
+                debugger
+                var _FormData = new FormData(document.getElementById('Banner_form'));
+                _FormData.append('Id', $('#Id').val());
+                _FormData.set('Status', $('input[name="Status"]:checked').val() == 1 ? true : false);
+                _FormData.append('File', $('#FileName')[0].files[0]);
+
+
+                $('#btn_Submit').html(spanner);
+                $.ajax({
+                    type: 'POST',
+                    url: '/VideoGallery/Submit',
+                    data: _FormData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.Code == 1) {
+
+                            $('#Banner_list').DataTable().destroy();
+                            GetData();
+                            document.getElementById("Banner_form").reset();
+                            $('.custom-file-label').text('Choose file');
+
+                            Utilities.HTML.Toastr.Show(106);
+                        }
+                        else
+                        {
+                            Utilities.HTML.Toastr.Show(response.Message);
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        Utilities.HTML.Toastr.Show(107);
+                    },
+                    complete: function (response) {
+
+                        $('#btn_Submit').text('Save/Update');
+                    }
+                });
+                //PostRequest('/admin/Banner/SavePressRelease', _FormData).done(function (response) {
+                //    if (response.Code == 1)
+                //    {
+                //        document.getElementById('Banner_form').reset();
+                //        $('.custom-file-label').text('Choose file');
+                //        $('.custom-file-label').removeAttr('title');
+                //        //Page.DataTable.destroy();
+                //        GetData();
+
+                //    }
+                //    Utilities.HTML.Alert.Show(106);
+
+                //}).fail(function () {
+                //    Utilities.HTML.Toastr.Show(107);
+                //}).always(function () {
+                //    //Utilities.HTML.Loader.Hide();
+                //});
+            }
+        });
+
+
+
+        $(".custom-file-input").on("change", function () {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
+
+
+    });
+</script>
+
+
