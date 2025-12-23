@@ -1,0 +1,73 @@
+/* NEWS */
+#news-bar {
+    float: left;
+    margin: 10px 0 0px 0px;
+    padding: 0px 0 0px 0px;
+    width: 990px;
+    height: 40px;
+    background-image: url(images/news-bg.jpg);
+    background-repeat: repeat-x;
+}
+
+#news-box {
+    float: left;
+    margin: 0 0 0px 0px;
+    padding: 0px 0 0px 0px;
+    width: 117px;
+    height: 40px;
+}
+
+#news-slide {
+    float: left;
+    margin: 0 0 0px 0px;
+    padding: 0px 0 0px 0px;
+    width: 850px;
+    height: 40px;
+}
+
+.tickercontainer { /* the outer div with the black border */
+    /*width: 850px;*/
+    /*height: 25px;*/
+    margin: 0;
+    padding: 1px 0 0 0px;
+    color: #1f2d31;
+    overflow: hidden;
+}
+
+    .tickercontainer .mask { /* that serves as a mask. so you get a sort of padding both left and right */
+        position: relative;
+        /*left: 0px;*/
+        /*top: 8px;*/
+        width: 100%;
+        overflow: hidden;
+        padding-top:6px;
+    }
+
+ul.newsticker { /* that's your list */
+    position: relative;
+    left: 750px;
+    font: bold 10px Verdana;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    
+}
+
+    ul.newsticker li {
+        float: left; /* important: display inline gives incorrect results when you check for elem's width */
+        margin: 0;
+        padding: 0;
+    }
+
+    ul.newsticker a {
+        white-space: nowrap;
+        padding: 0;
+        color: #36e112;
+        font: bold 10px Verdana;
+        margin: 0 50px 0 0;
+    }
+
+    ul.newsticker span {
+        margin: 0 10px 0 0;
+    }
+/* news end */
